@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C5CBAA6D-EDA8-4015-A7A9-306F82DFD577}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FeatureToggle</RootNamespace>
+    <AssemblyName>FeatureToggle</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\ForeignKeyAttribute.cs" />
+    <Compile Include="Attributes\IdentityAttribute.cs" />
+    <Compile Include="Config\FeatureToggleConfigurationSection.cs" />
+    <Compile Include="Config\NameValueConfigElement.cs" />
+    <Compile Include="DataBase\Abstract\BaseRepository.cs" />
+    <Compile Include="DataBase\Abstract\DbObject.cs" />
+    <Compile Include="DataBase\Models\Context.cs" />
+    <Compile Include="DataBase\Models\Feature.cs" />
+    <Compile Include="DataBase\Models\FeatureContext.cs" />
+    <Compile Include="DataBase\Repositories\ContextRepository.cs" />
+    <Compile Include="DataBase\Repositories\FeatureContextRepository.cs" />
+    <Compile Include="DataBase\Repositories\FeatureRepository.cs" />
+    <Compile Include="Enums\DefaultFeatureValue.cs" />
+    <Compile Include="Exceptions\FeatureNotFounException.cs" />
+    <Compile Include="Config\FeatureToggleConfiguration.cs" />
+    <Compile Include="FeatureToggleService.cs" />
+    <Compile Include="IFeatureToggle.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransferObjects\FeatureContextDto.cs" />
+    <Compile Include="TransferObjects\FeatureDto.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
