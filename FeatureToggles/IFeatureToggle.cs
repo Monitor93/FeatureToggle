@@ -29,11 +29,11 @@ namespace FeatureToggle
         /// <summary>
         /// Проверить функциональность фичи с учётом контекста
         /// </summary>
-        /// <param name="key">ФИчва</param>
-        /// <param name="context"></param>
-        /// <param name="param"></param>
+        /// <param name="key">Фича</param>
+        /// <param name="context">Контекст</param>
+        /// <param name="param">Параметр</param>
         /// <param name="defaultValue">Результат в случае если фича не найдена</param>
-        /// <returns></returns>
+        /// <returns>Включена ли фича с заданным контекстом и параметром</returns>
         bool IsEnable(string key, string context, string param, DefaultFeatureValue defaultValue = DefaultFeatureValue.False);
 
         /// <summary>

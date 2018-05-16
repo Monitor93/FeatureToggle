@@ -7,6 +7,9 @@ namespace TestConsole
 {
     public class ManagerInstaller : IWindsorInstaller
     {
+        /// <summary>
+        /// Инсталер IoC контейнера для <see cref="ISomeManager"/>
+        /// </summary>
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(Component.For<ISomeManager>().ImplementedBy<SomeManager>().LifeStyle.Transient);

@@ -9,6 +9,9 @@ namespace TestConsole
 {
     class Program
     {
+        /// <summary>
+        /// IoC контейнер
+        /// </summary>
         static readonly WindsorContainer Container;
 
         private static ISomeManager _someManager;
@@ -25,6 +28,9 @@ namespace TestConsole
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Проверка основных функций <see cref="FeatureToggle.FeatureToggleService"/>
+        /// </summary>
         static void MainProccess()
         {
             Console.WriteLine("================ MainProccess:");
@@ -61,6 +67,9 @@ namespace TestConsole
             }
         }
 
+        /// <summary>
+        /// Проверка основных функций <see cref="FeatureToggle.FeatureToggleService"/>
+        /// </summary>
         static void MainProcessWithContext()
         {
             Console.WriteLine("================ MainProcessWithContext:");
@@ -90,6 +99,9 @@ namespace TestConsole
             _someManager.GetFeature("featureWithContext", "ContextForDelete", "Param");
         }
 
+        /// <summary>
+        /// Проверка работы основных процессов в паралельных потоках
+        /// </summary>
         static void ParallelMainProcesses()
         {
             Console.WriteLine("================ ParallelMainProcesses:");
@@ -98,6 +110,9 @@ namespace TestConsole
                 MainProcessWithContext);
         }
 
+        /// <summary>
+        /// Тест работы в паралельных потоках
+        /// </summary>
         static void ParallelTest()
         {
             Console.WriteLine("================ ParallelTest:");
@@ -115,6 +130,10 @@ namespace TestConsole
                 ParralelProccessCheckRead,
                 ParralelProccessDelete);
         }
+
+        /// <summary>
+        /// Тест паралельной работы через таски
+        /// </summary>
         static void ParallelTestAsTask()
         {
             Console.WriteLine("================ ParallelTestAsTask:");
@@ -133,21 +152,37 @@ namespace TestConsole
                 Task.Factory.StartNew(ParralelProccessDelete));
         }
 
+        /// <summary>
+        /// Функция создания фичи для паралельного теста
+        /// </summary>
+        /// <param name="featureValue">Значение фичи</param>
         static void ParralelProccessWrite(bool featureValue)
         {
             var someManager = Container.Resolve<ISomeManager>();
             someManager.AddFeature("parallelFeature", featureValue);
         }
+
+        /// <summary>
+        /// Функция чтение фичи для паралельного теста
+        /// </summary>
         static void ParralelProccessRead()
         {
             var someManager = Container.Resolve<ISomeManager>();
             someManager.GetFeature("parallelFeature");
         }
+
+        /// <summary>
+        /// Функция удаления фичи для паралельного теста
+        /// </summary>
         static void ParralelProccessDelete()
         {
             var someManager = Container.Resolve<ISomeManager>();
             someManager.DeleteFeature("parallelFeature");
         }
+
+        /// <summary>
+        /// Функция чтение фичи с проверкой для паралельного теста
+        /// </summary>
         static void ParralelProccessCheckRead()
         {
             var someManager = Container.Resolve<ISomeManager>();
@@ -161,6 +196,9 @@ namespace TestConsole
             }
         }
 
+        /// <summary>
+        /// Проверка sql инекций
+        /// </summary>
         static void SqlInjection()
         {
             Console.WriteLine("================ SqlInjection:");
@@ -169,6 +207,9 @@ namespace TestConsole
 
         }
 
+        /// <summary>
+        /// Статический конструктор для инициализации IoC контейнера
+        /// </summary>
         static Program()
         {
             Container = new WindsorContainer();

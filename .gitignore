@@ -1,0 +1,9 @@
+﻿################################################################################
+# Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/FeatureToggles
+/FeatureToggles/obj/Debug
+/FeatureToggles/bin/Debug
+/TestConsole/obj/Debug
+/TestConsole/bin/Debug

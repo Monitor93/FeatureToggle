@@ -54,6 +54,9 @@ namespace FeatureToggle.Config
             }
         }
 
+        /// <summary>
+        /// Секция настроек FeatureToggle
+        /// </summary>
         private static FeatureToggleConfigurationSection Section => (FeatureToggleConfigurationSection)ConfigurationManager.GetSection("featureToggle");
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using FeatureToggle.Config;
 using System.Linq;
 using FeatureToggle.Attributes;
@@ -9,20 +8,41 @@ using System.Reflection;
 
 namespace FeatureToggle.DataBase.Abstract
 {
+    /// <summary>
+    /// Базовый класс для репозиториев
+    /// </summary>
+    /// <typeparam name="T">Сущность с которой работает репозиторий</typeparam>
+    /// <typeparam name="TKey"></typeparam>
     abstract class BaseRepository<T, TKey> : IDisposable where T : DbObject<TKey>, new()
     {
-
+        /// <summary>
+        /// Имя таблицы
+        /// </summary>
         protected readonly string TableName = typeof(T).Name;
+
+        /// <summary>
+        /// Информация о типе <see cref="T"/>
+        /// </summary>
         protected readonly Type Type = typeof(T);
 
+        /// <summary>
+        /// Соединение с БД
+        /// </summary>
         protected readonly SqlConnection SqlConnection;
 
+        /// <summary>
+        /// Создаёт экземпляр репозитория
+        /// </summary>
         protected BaseRepository()
         {
             SqlConnection = new SqlConnection(FeatureToggleConfiguration.ConnectionString);
             ExecuteNonQuery(CheckAndCreateTableSqlCommandSql());
         }
 
+        /// <summary>
+        /// Сохраняет информацию о объектах
+        /// </summary>
+        /// <param name="obj">Объекты для сохранения</param>
         public virtual void Save(params T[] obj)
         {
             if (obj.Any())
@@ -31,24 +51,31 @@ namespace FeatureToggle.DataBase.Abstract
             }
         }
 
+        /// <summary>
+        /// Получает объект из базы
+        /// </summary>
+        /// <param name="key">Ключ объекта</param>
+        /// <returns>Объект</returns>
         public virtual T Get(TKey key)
         {
             return ExecuteQuery(SelectByIdSqlCommand(key)).FirstOrDefault();
         }
 
-        public virtual List<T> GetAll()
-        {
-            return ExecuteQuery(SelectAllSqlCommand());
-        }
-
+        /// <summary>
+        /// Удаляет объект из базы по ключу
+        /// </summary>
+        /// <param name="key">Ключ объекта</param>
         public virtual void Delete(TKey key)
         {
             ExecuteNonQuery(DeleteByIdSqlCommand(key));
         }
 
+        /// <summary>
+        /// Исполняет запрос без возвращаемого результата
+        /// </summary>
+        /// <param name="command">Исполняемая sql команда</param>
         protected void ExecuteNonQuery(SqlCommand command)
         {
-            Debug.WriteLine($"FeatureToogle SqlNonQuery by '{GetType().Name}'\n{command.CommandText}");
             lock (SqlConnection)
             {
                 SqlConnection.Open();
@@ -60,9 +87,13 @@ namespace FeatureToggle.DataBase.Abstract
             }
         }
 
+        /// <summary>
+        /// Исполняет запрос и возвращает объекты типа <see cref="T"/>
+        /// </summary>
+        /// <param name="command">Исполняемая sql команда</param>
+        /// <returns>Объекты полученные в результате исполнения запроса</returns>
         protected List<T> ExecuteQuery(SqlCommand command)
         {
-            Debug.WriteLine($"FeatureToogle SqlQuery by '{GetType().Name}'\n{command.CommandText}");
             lock (SqlConnection)
             {
                 SqlConnection.Open();
@@ -94,23 +125,11 @@ namespace FeatureToggle.DataBase.Abstract
             }
         }
 
-        protected string ToSqlValue(object x)
-        {
-            var xType = x.GetType();
-            var typesUseQuotes = new[]
-            {
-                typeof(string),
-                typeof(Guid),
-                typeof(DateTime),
-                typeof(TimeSpan),
-            };
-            return typesUseQuotes.Contains(xType)
-                ? "'" + x.ToString() + "'"
-                : xType == typeof(bool)
-                    ? Convert.ToInt32(x).ToString()
-                    : x.ToString();
-        }
-
+        /// <summary>
+        /// Создаёт sql команду инсёрта объектов в таблицу
+        /// </summary>
+        /// <param name="dicts">Объекты представленные в виде словаря где ключ это имя поля, а значение - коллекция значений этого поля у сохраняемых объектов</param>
+        /// <returns>Созданная Sql команда</returns>
         protected SqlCommand InsertOrUpdateSqlCommand(Dictionary<string, IEnumerable<object>> dicts) 
         {
             var valuesAsStr = new List<string>();
@@ -157,16 +176,20 @@ namespace FeatureToggle.DataBase.Abstract
             return command;
         }
 
+        /// <summary>
+        /// Условие для запроса мёржа
+        /// </summary>
+        /// <returns>Строка запроса мёржа</returns>
         protected virtual string MergeCondition()
         {
             return "Target.Id = Source.Id";
         }
 
-        protected SqlCommand SelectAllSqlCommand()
-        {
-            return new SqlCommand($"select * from {TableName}", SqlConnection);
-        }
-
+        /// <summary>
+        /// Создаёт sql команду по получению объекта по ключу
+        /// </summary>
+        /// <param name="id">Ключ объекта</param>
+        /// <returns>Созданная Sql команда</returns>
         protected SqlCommand SelectByIdSqlCommand(TKey id)
         {
             var command = new SqlCommand($"select * from {TableName} where Id = @Id", SqlConnection);
@@ -174,6 +197,11 @@ namespace FeatureToggle.DataBase.Abstract
             return command;
         }
 
+        /// <summary>
+        /// Создаёт sql команду по удалению объекта по ключу
+        /// </summary>
+        /// <param name="id">Ключ объекта</param>
+        /// <returns>Созданная Sql команда</returns>
         protected SqlCommand DeleteByIdSqlCommand(TKey id)
         {
             var command = new SqlCommand($"delete from {TableName} where Id = @Id", SqlConnection);
@@ -181,12 +209,21 @@ namespace FeatureToggle.DataBase.Abstract
             return command;
         }
 
+        /// <summary>
+        /// Конвертирует массив объектов в словарь где ключ это имя поля, а значение - коллекция значений этого поля у сохраняемых объектов
+        /// </summary>
+        /// <param name="obj">Объекты для конвертации</param>
+        /// <returns>Объекты сконвертированные в словраь</returns>
         protected Dictionary<string, IEnumerable<object>> ConvertToDictionary(params T[] obj)
         {
             return Type.GetProperties()
                 .ToDictionary(prop => prop.Name, prop => obj.Select(prop.GetValue));
         }
 
+        /// <summary>
+        /// Получает список свойст типа не содержащих аттрибут <see cref="IdentityAttribute"/>
+        /// </summary>
+        /// <returns>Свойства без атрибута <see cref="IdentityAttribute"/></returns>
         protected IEnumerable<PropertyInfo> PropertyWithoutIdentity()
         {
             var props = Type.GetProperties();

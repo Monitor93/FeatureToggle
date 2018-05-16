@@ -16,13 +16,22 @@ namespace FeatureToggle
     /// </summary>
     public class FeatureToggleService : IFeatureToggle, IDisposable
     {
+        /// <summary>
+        /// Репозитории
+        /// </summary>
         private readonly FeatureRepository _featureRepository;
         private readonly ContextRepository _contextRepository;
         private readonly FeatureContextRepository _featureContextToggleRepository;
 
+        /// <summary>
+        /// Кэш
+        /// </summary>
         private static readonly MemoryCache Cash;
         private static readonly object Locker = new object();
 
+        /// <summary>
+        /// Создаёт политику кэша с заданным временем жизни записи в кэше
+        /// </summary>
         private static CacheItemPolicy CachePolicy => new CacheItemPolicy
         {
             AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow.Add(FeatureToggleConfiguration.CasheLifeTime))
@@ -38,6 +47,9 @@ namespace FeatureToggle
             _featureContextToggleRepository = new FeatureContextRepository();
         }
 
+        /// <summary>
+        /// Статический конструктор для инициализации кэша
+        /// </summary>
         static FeatureToggleService()
         {
             lock (Locker)
@@ -135,11 +147,11 @@ namespace FeatureToggle
         /// <summary>
         /// Проверить функциональность фичи с учётом контекста
         /// </summary>
-        /// <param name="key">ФИчва</param>
-        /// <param name="context"></param>
-        /// <param name="param"></param>
+        /// <param name="key">Фича</param>
+        /// <param name="context">Контекст</param>
+        /// <param name="param">Параметр</param>
         /// <param name="defaultValue">Результат в случае если фича не найдена</param>
-        /// <returns></returns>
+        /// <returns>Включена ли фича с заданным контекстом и параметром</returns>
         public bool IsEnable(string key, string context, string param, DefaultFeatureValue defaultValue = DefaultFeatureValue.False)
         {
             var feature = GetFeature(key);
@@ -200,6 +212,11 @@ namespace FeatureToggle
             RefreshFeatureInCashe(feature, GetFeatureDtoFromDb(feature));
         }
 
+        /// <summary>
+        /// Обновляет информацию о фиче в кэше
+        /// </summary>
+        /// <param name="key">Ключ фичи</param>
+        /// <param name="feature">фича</param>
         private void RefreshFeatureInCashe(string key, FeatureDto feature)
         {
             lock (key)
@@ -215,6 +232,11 @@ namespace FeatureToggle
             }
         }
 
+        /// <summary>
+        /// Получает фичу из базы данных
+        /// </summary>
+        /// <param name="key">Ключ фичи</param>
+        /// <returns>Фича</returns>
         private FeatureDto GetFeatureDtoFromDb(string key)
         {
             var feature = _featureRepository.Get(key);

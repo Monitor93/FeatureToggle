@@ -1,5 +1,4 @@
 ﻿using FeatureToggle.DataBase.Models;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,6 +68,10 @@ namespace FeatureToggle.TransferObjects
             Contexts = context.ToList();
         }
 
+        /// <summary>
+        /// Создаёт транспортный объект фичи на основе доменной модели 
+        /// </summary>
+        /// <param name="feature">Доменная модель фичи</param>
         internal FeatureDto(Feature feature)
         {
             Key = feature.Id;
@@ -76,6 +79,11 @@ namespace FeatureToggle.TransferObjects
             Contexts = new List<FeatureContextDto>();
         }
 
+        /// <summary>
+        /// Создаёт транспортный объект фичи с контекстом на основе доменных моелей
+        /// </summary>
+        /// <param name="feature">Доменная модель фичи</param>
+        /// <param name="context">Доменные модели контекстов</param>
         internal FeatureDto(Feature feature, IEnumerable<FeatureToContext> context)
         {
             Key = feature.Id;
